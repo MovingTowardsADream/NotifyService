@@ -27,7 +27,7 @@ func New(log *slog.Logger, cfg *configs.Config) *App {
 		panic("app - Run - postgres.NewPostgresDB: " + err.Error())
 	}
 
-	rmqClient, err := client.NewRabbitMQClient(cfg.RMQ.URL, cfg.RMQ.ServerExchange, cfg.RMQ.ClientExchange)
+	rmqClient, err := rmq_client.NewRabbitMQClient(cfg.RMQ.URL, cfg.RMQ.ServerExchange, cfg.RMQ.ClientExchange)
 	if err != nil {
 		panic("app - Run - rmqServer - server.New" + err.Error())
 	}

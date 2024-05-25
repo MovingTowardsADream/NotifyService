@@ -1,4 +1,4 @@
-package client
+package rmq_client
 
 import (
 	"NotifiService/pkg/rabbitmq/rmq_rpc"
@@ -102,7 +102,6 @@ func (c *Client) RemoteCall(ctx context.Context, handler string, request interfa
 	}
 
 	corrID := uuid.New().String()
-
 	err := c.publish(corrID, handler, request)
 	if err != nil {
 		return fmt.Errorf("rmq_rpc client - Client - RemoteCall - c.publish: %w", err)
