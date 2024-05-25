@@ -1,4 +1,4 @@
-package rabbitmq
+package gateway_rabbitmq
 
 import (
 	"NotifiService/internal/entity"
@@ -27,7 +27,7 @@ func (gw *NotifyGateway) CreateNotifyMessageOnRabbitMQ(ctx context.Context, comm
 	})
 
 	if err != nil {
-		return fmt.Errorf("WalletGateway - CreateNewWalletWithBalance - gw.rmq.RemoteCall: %w", err)
+		return fmt.Errorf("NotifyGateway - CreateNotifyMessageOnRabbitMQ - gw.rmq.RemoteCall: %w", err)
 	}
 
 	return nil
