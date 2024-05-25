@@ -23,7 +23,7 @@ func New(rmq NotifyGatewayRMQ) *NotifyGateway {
 func (gw *NotifyGateway) CreateNotifyMessageOnRabbitMQ(ctx context.Context, communication entity.UserCommunication) error {
 
 	err := wrapper(ctx, func() error {
-		return gw.rmq.RemoteCall(ctx, "createNewWallet", communication)
+		return gw.rmq.RemoteCall(ctx, "createNewNotify", communication)
 	})
 
 	if err != nil {
