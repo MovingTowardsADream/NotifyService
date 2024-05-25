@@ -3,7 +3,6 @@ package rmq_server
 import (
 	"NotifiService/pkg/logger"
 	"NotifiService/pkg/rabbitmq/rmq_rpc"
-	"encoding/json"
 	"fmt"
 	"github.com/streadway/amqp"
 	"log/slog"
@@ -96,18 +95,15 @@ func (s *Server) serveCall(d *amqp.Delivery) {
 	}
 
 	response, err := callHandler(d)
+
 	if err != nil {
+		// TODO republish response
+		fmt.Println(response)
+
 		s.publish(d, nil, err.Error())
 
 		return
 	}
-
-	body, err := json.Marshal(response)
-	if err != nil {
-		s.logger.Error("rmq_rpc server - Server - serveCall - json.Marshal", logger.Err(err))
-	}
-
-	s.publish(d, body, Success)
 }
 
 func (s *Server) publish(d *amqp.Delivery, body []byte, status string) {

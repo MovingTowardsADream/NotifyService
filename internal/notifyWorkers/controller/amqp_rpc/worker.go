@@ -32,8 +32,7 @@ func (r *notifyWorkerRoutes) createNewNotify() rmq_server.CallHandler {
 
 		err := r.w.CreateNewNotify(context.Background(), request)
 		if err != nil {
-			return nil,
-				fmt.Errorf("amqp_rpc - notifyWorkerRoutes - createNewNotify - r.w.CreateNewNotify: %w", err)
+			return request, fmt.Errorf("amqp_rpc - notifyWorkerRoutes - createNewNotify - r.w.CreateNewNotify: %w", err)
 		}
 
 		return nil, nil
