@@ -7,7 +7,7 @@ import (
 )
 
 type NotifyGateway interface {
-	CreateNotifyMessageOnRabbitMQ(ctx context.Context, communication entity.UserCommunication) error
+	CreateNotifyMessageOnRabbitMQ(ctx context.Context, notify entity.Notify) error
 }
 
 type Gateway struct {

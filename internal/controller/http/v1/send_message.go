@@ -25,7 +25,7 @@ func newSendMessageRoutes(handler *gin.RouterGroup, w usecase.NotifySend, l *slo
 }
 
 func (r *sendMessageRoutes) sendMessageById(c *gin.Context) {
-	var notifyRequest entity.NotificationRequest
+	var notifyRequest entity.RequestNotification
 
 	if err := c.BindJSON(&notifyRequest); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
@@ -45,5 +45,11 @@ func (r *sendMessageRoutes) sendMessageById(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "ok")
+	type response struct {
+		Message string `json:"message"`
+	}
+
+	c.JSON(http.StatusOK, response{
+		Message: "success",
+	})
 }

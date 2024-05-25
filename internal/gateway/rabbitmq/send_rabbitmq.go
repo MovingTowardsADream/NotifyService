@@ -20,10 +20,9 @@ func New(rmq NotifyGatewayRMQ) *NotifyGateway {
 }
 
 // Creating new wallet with balance, through remote call to rmq server.
-func (gw *NotifyGateway) CreateNotifyMessageOnRabbitMQ(ctx context.Context, communication entity.UserCommunication) error {
-
+func (gw *NotifyGateway) CreateNotifyMessageOnRabbitMQ(ctx context.Context, notify entity.Notify) error {
 	err := wrapper(ctx, func() error {
-		return gw.rmq.RemoteCall(ctx, "createNewNotify", communication)
+		return gw.rmq.RemoteCall(ctx, "createNewNotify", notify)
 	})
 
 	if err != nil {

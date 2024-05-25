@@ -12,7 +12,7 @@ type EditInfo interface {
 }
 
 type NotifySend interface {
-	SendNotifyForUser(ctx context.Context, notifyRequest entity.NotificationRequest) error
+	SendNotifyForUser(ctx context.Context, notifyRequest entity.RequestNotification) error
 }
 
 type UseCase struct {

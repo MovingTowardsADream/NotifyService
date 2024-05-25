@@ -30,23 +30,32 @@ func NewSendUseCase(gw gateway.NotifyGateway, repo repository.UsersData) *SendUs
 	return uc
 }
 
-func (uc *SendUseCase) SendNotifyForUser(ctx context.Context, notifyRequest entity.NotificationRequest) error {
+func (uc *SendUseCase) SendNotifyForUser(ctx context.Context, notifyRequest entity.RequestNotification) error {
 	// Установка timeout на операцию
 	ctxTimeout, cancel := context.WithTimeout(ctx, _defaultTimeout)
 	defer cancel()
 
 	users_communications, err := uc.repo.GetUserCommunication(ctxTimeout, notifyRequest.UserID)
 
-	fmt.Println(users_communications)
-
 	if err != nil {
 		return fmt.Errorf("SendUseCase - SendNotifyForUsers - uc.repo.GetUserCommunication: %w", err)
 	}
-	//
-	//err = uc.gateway.CreateNotifyMessageOnRabbitMQ(ctxTimeout, users_communications)
-	//if err != nil {
-	//	return fmt.Errorf("SendUseCase - SendNotifyForUsers - uc.gateway.CreateNotifyMessageOnRabbitMQ: %w", err)
-	//}
+
+	err = uc.gateway.CreateNotifyMessageOnRabbitMQ(ctxTimeout, entity.Notify{
+		UserID:     notifyRequest.UserID,
+		NotifyType: notifyRequest.NotifyType,
+		EmailBody: entity.EmailBody{
+			Email:   users_communications.Email,
+			Channel: notifyRequest.Channels.EmailChannel,
+		},
+		PhoneBody: entity.PhoneBody{
+			Phone:   users_communications.Phone,
+			Channel: notifyRequest.Channels.PhoneChannel,
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("SendUseCase - SendNotifyForUsers - uc.gateway.CreateNotifyMessageOnRabbitMQ: %w", err)
+	}
 
 	return nil
 }
