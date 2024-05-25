@@ -4,7 +4,7 @@ import (
 	"NotifiService/configs"
 	"NotifiService/internal/repository"
 	"NotifiService/pkg/postgres"
-	"fmt"
+	"NotifiService/pkg/rabbitmq/rmq_rpc/client"
 	"log/slog"
 )
 
@@ -22,9 +22,12 @@ func New(log *slog.Logger, cfg *configs.Config) *App {
 		panic("app - Run - postgres.NewPostgresDB: " + err.Error())
 	}
 
-	repo := repository.NewRepository(pg)
+	rmqClient, err := client.NewRabbitMQClient(cfg.RMQ.URL, cfg.RMQ.ServerExchange, cfg.RMQ.ClientExchange)
+	if err != nil {
+		panic("app - Run - rmqServer - server.New" + err.Error())
+	}
 
-	fmt.Println(repo)
+	repo := repository.NewRepository(pg)
 
 	return &App{
 		//HTTPServer: ,
