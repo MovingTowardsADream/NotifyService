@@ -2,10 +2,8 @@ package app
 
 import (
 	"NotifiService/configs"
-	"NotifiService/internal/entity"
 	"NotifiService/internal/repository"
 	"NotifiService/pkg/postgres"
-	"context"
 	"fmt"
 	"log/slog"
 )
@@ -26,21 +24,7 @@ func New(log *slog.Logger, cfg *configs.Config) *App {
 
 	repo := repository.NewRepository(pg)
 
-	pref := entity.UserPreferences{
-		UserID: "5dc6900bf5dc29d4685b6bfd63c9d257",
-		Preferences: []entity.Preference{
-			entity.Preference{
-				NotifyType: "promotions",
-				Channel:    "email",
-				Approval:   true,
-			},
-		},
-	}
-	err = repo.UsersData.EditUserPreferences(context.Background(), pref)
-
-	if err != nil {
-		fmt.Println(err)
-	}
+	fmt.Println(repo)
 
 	return &App{
 		//HTTPServer: ,
