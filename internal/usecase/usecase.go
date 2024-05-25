@@ -20,7 +20,7 @@ type UseCase struct {
 	NotifySend
 }
 
-func NewUseCase(repos *repository.Repository, gw gateway.Gateway) *UseCase {
+func NewUseCase(repos *repository.Repository, gw *gateway.Gateway) *UseCase {
 	return &UseCase{
 		EditInfo:   NewEditUseCase(repos.UsersData),
 		NotifySend: NewSendUseCase(gw.NotifyGateway, repos.UsersData),
