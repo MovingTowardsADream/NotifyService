@@ -4,7 +4,6 @@ import (
 	"NotifiService/internal/entity"
 	"NotifiService/internal/usecase"
 	"NotifiService/pkg/logger"
-	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"log/slog"
@@ -21,19 +20,26 @@ func newSendMessageRoutes(handler *gin.RouterGroup, w usecase.NotifySend, l *slo
 
 	h := handler.Group("/messages")
 	{
-		h.POST("/send", r.sendAllMessage)
+		h.POST("/send", r.sendMessageById)
 	}
 }
 
-func (r *sendMessageRoutes) sendAllMessage(c *gin.Context) {
-	err := r.w.SendNotifyForUser(context.Background(), "")
+func (r *sendMessageRoutes) sendMessageById(c *gin.Context) {
+	var notifyRequest entity.NotificationRequest
+
+	if err := c.BindJSON(&notifyRequest); err != nil {
+		c.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	err := r.w.SendNotifyForUser(c.Request.Context(), notifyRequest)
 	if err != nil {
 		if errors.Is(err, entity.ErrTimeout) {
 			c.AbortWithStatus(http.StatusGatewayTimeout)
 			return
 		}
 
-		r.l.Error("http - v1 - createNewWallet", logger.Err(err))
+		r.l.Error("http - v1 - sendMessageById", logger.Err(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 
 		return

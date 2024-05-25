@@ -8,11 +8,11 @@ import (
 )
 
 type EditInfo interface {
-	EditPreferences(ctx context.Context, preferences entity.UserPreferences) error
+	EditPreferences(ctx context.Context, preferences entity.RequestPreferences) error
 }
 
 type NotifySend interface {
-	SendNotifyForUser(ctx context.Context, id string) error
+	SendNotifyForUser(ctx context.Context, notifyRequest entity.NotificationRequest) error
 }
 
 type UseCase struct {

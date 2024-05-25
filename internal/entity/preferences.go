@@ -1,12 +1,21 @@
 package entity
 
-type Preference struct {
+type Preferences struct {
+	Email EmailPreferences `json:"email"`
+	Phone PhonePreferences `json:"phone"`
+}
+
+type EmailPreferences struct {
 	NotifyType string `json:"notifyType"`
-	Channel    string `json:"channel"`
 	Approval   bool   `json:"approval"`
 }
 
-type UserPreferences struct {
-	UserID      string       `json:"userId"`
-	Preferences []Preference `json:"preferences"`
+type PhonePreferences struct {
+	NotifyType string `json:"notifyType"`
+	Approval   bool   `json:"approval"`
+}
+
+type RequestPreferences struct {
+	UserID      string      `json:"userId"`
+	Preferences Preferences `json:"preferences"`
 }

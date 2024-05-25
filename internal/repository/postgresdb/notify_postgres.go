@@ -47,10 +47,10 @@ func (r *NotifyRepo) GetUserCommunication(ctx context.Context, id string) (entit
 	return userCommunication, nil
 }
 
-func (r *NotifyRepo) EditUserPreferences(ctx context.Context, preferences entity.UserPreferences) error {
+func (r *NotifyRepo) EditUserPreferences(ctx context.Context, preferences entity.RequestPreferences) error {
 	tx, err := r.db.Pool.Begin(ctx)
 	if err != nil {
-		return fmt.Errorf("NewNotifyRepo.EditUserPreferences - r.Pool.Begin: %v", err)
+		return fmt.Errorf("NotifyRepo.EditUserPreferences - r.Pool.Begin: %v", err)
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
@@ -66,33 +66,31 @@ func (r *NotifyRepo) EditUserPreferences(ctx context.Context, preferences entity
 		if errors.Is(err, pgx.ErrNoRows) {
 			return repository_errors.ErrNotFound
 		}
-		return fmt.Errorf("NewNotifyRepo.EditUserPreferences - tx.QueryRow: %v", err)
+		return fmt.Errorf("NotifyRepo.EditUserPreferences - tx.QueryRow: %v", err)
 	}
 
-	for i := 0; i < len(preferences.Preferences); i++ {
-		if preferences.Preferences[i].Channel == "email" {
-			email_notify = preferences.Preferences[i].Approval
-		}
-		if preferences.Preferences[i].Channel == "phone" {
-			phone_notify = preferences.Preferences[i].Approval
-		}
+	if preferences.Preferences.Email.NotifyType == "" {
+		preferences.Preferences.Email.Approval = email_notify
+	}
+	if preferences.Preferences.Phone.NotifyType == "" {
+		preferences.Preferences.Phone.Approval = phone_notify
 	}
 
 	sql, args, _ = r.db.Builder.
 		Update(notifyTable).
-		Set("email_notify", email_notify).
-		Set("phone_notify", phone_notify).
+		Set("email_notify", preferences.Preferences.Email.Approval).
+		Set("phone_notify", preferences.Preferences.Phone.Approval).
 		Where("user_id = ?", preferences.UserID).
 		ToSql()
 
 	_, err = tx.Exec(ctx, sql, args...)
 	if err != nil {
-		return fmt.Errorf("AccountRepo.Deposit - tx.Exec: %v", err)
+		return fmt.Errorf("NotifyRepo.EditUserPreferences - tx.Exec: %v", err)
 	}
 
 	err = tx.Commit(ctx)
 	if err != nil {
-		return fmt.Errorf("NewNotifyRepo.EditUserPreferences - tx.Commit: %v", err)
+		return fmt.Errorf("NotifyRepo.EditUserPreferences - tx.Commit: %v", err)
 	}
 
 	return nil

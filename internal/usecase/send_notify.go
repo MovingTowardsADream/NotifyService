@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"NotifiService/internal/entity"
 	"NotifiService/internal/gateway"
 	"NotifiService/internal/repository"
 	"context"
@@ -29,21 +30,23 @@ func NewSendUseCase(gw gateway.NotifyGateway, repo repository.UsersData) *SendUs
 	return uc
 }
 
-func (uc *SendUseCase) SendNotifyForUser(ctx context.Context, id string) error {
+func (uc *SendUseCase) SendNotifyForUser(ctx context.Context, notifyRequest entity.NotificationRequest) error {
 	// Установка timeout на операцию
 	ctxTimeout, cancel := context.WithTimeout(ctx, _defaultTimeout)
 	defer cancel()
 
-	users_communications, err := uc.repo.GetUserCommunication(ctxTimeout, id)
+	users_communications, err := uc.repo.GetUserCommunication(ctxTimeout, notifyRequest.UserID)
+
+	fmt.Println(users_communications)
 
 	if err != nil {
 		return fmt.Errorf("SendUseCase - SendNotifyForUsers - uc.repo.GetUserCommunication: %w", err)
 	}
-
-	err = uc.gateway.CreateNotifyMessageOnRabbitMQ(ctxTimeout, users_communications)
-	if err != nil {
-		return fmt.Errorf("SendUseCase - SendNotifyForUsers - uc.gateway.CreateNotifyMessageOnRabbitMQ: %w", err)
-	}
+	//
+	//err = uc.gateway.CreateNotifyMessageOnRabbitMQ(ctxTimeout, users_communications)
+	//if err != nil {
+	//	return fmt.Errorf("SendUseCase - SendNotifyForUsers - uc.gateway.CreateNotifyMessageOnRabbitMQ: %w", err)
+	//}
 
 	return nil
 }

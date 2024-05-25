@@ -9,7 +9,7 @@ import (
 
 type UsersData interface {
 	GetUserCommunication(ctx context.Context, id string) (entity.UserCommunication, error)
-	EditUserPreferences(ctx context.Context, preferences entity.UserPreferences) error
+	EditUserPreferences(ctx context.Context, preferences entity.RequestPreferences) error
 }
 
 type Repository struct {

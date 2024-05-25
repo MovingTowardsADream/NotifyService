@@ -4,7 +4,6 @@ import (
 	"NotifiService/internal/entity"
 	"NotifiService/internal/usecase"
 	"NotifiService/pkg/logger"
-	"context"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"log/slog"
@@ -26,14 +25,14 @@ func newUsersRoutes(handler *gin.RouterGroup, w usecase.EditInfo, l *slog.Logger
 }
 
 func (r *usersRoutes) UserPreferences(c *gin.Context) {
-	var preferences entity.UserPreferences
+	var preferences entity.RequestPreferences
 
 	if err := c.BindJSON(&preferences); err != nil {
 		c.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	err := r.w.EditPreferences(context.Background(), preferences)
+	err := r.w.EditPreferences(c.Request.Context(), preferences)
 	if err != nil {
 		if errors.Is(err, entity.ErrTimeout) {
 			c.AbortWithStatus(http.StatusGatewayTimeout)
@@ -50,5 +49,7 @@ func (r *usersRoutes) UserPreferences(c *gin.Context) {
 		Message string `json:"message"`
 	}
 
-	c.JSON(http.StatusOK, response{Message: "success"})
+	c.JSON(http.StatusOK, response{
+		Message: "success",
+	})
 }
