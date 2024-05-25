@@ -21,11 +21,11 @@ func newUsersRoutes(handler *gin.RouterGroup, w usecase.EditInfo, l *slog.Logger
 
 	h := handler.Group("/user")
 	{
-		h.PUT("/preferences", r.CreateUser)
+		h.PUT("/preferences", r.UserPreferences)
 	}
 }
 
-func (r *usersRoutes) CreateUser(c *gin.Context) {
+func (r *usersRoutes) UserPreferences(c *gin.Context) {
 	var preferences entity.UserPreferences
 
 	if err := c.BindJSON(&preferences); err != nil {
@@ -40,7 +40,7 @@ func (r *usersRoutes) CreateUser(c *gin.Context) {
 			return
 		}
 
-		r.l.Error("http - v1 - createNewUser", logger.Err(err))
+		r.l.Error("http - v1 - UserPreferences", logger.Err(err))
 		c.AbortWithStatus(http.StatusInternalServerError)
 
 		return
