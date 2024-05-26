@@ -1,7 +1,6 @@
 package main
 
 import (
-	"NotifiService/configs"
 	"errors"
 	"flag"
 	"fmt"
@@ -22,7 +21,7 @@ func main() {
 		panic("Migrations-path is required")
 	}
 
-	cfg := configs.MustLoad()
+	//cfg := configs.MustLoad()
 
 	if err := godotenv.Load(); err != nil {
 		panic("Failed reading db password")
@@ -30,7 +29,8 @@ func main() {
 
 	m, err := migrate.New(
 		"file://"+migrationsPath,
-		fmt.Sprintf(cfg.PG.URL),
+		//fmt.Sprintf(cfg.PG.URL),
+		fmt.Sprintf("postgres://postgres:admin@localhost:5432/notify?sslmode=disable"),
 	)
 	if err != nil {
 		panic(err)
