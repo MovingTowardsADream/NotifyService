@@ -1,4 +1,56 @@
 basePath: /api/v1
+definitions:
+  entity.Channel:
+    properties:
+      body:
+        type: string
+      subject:
+        type: string
+    type: object
+  entity.Channels:
+    properties:
+      email:
+        $ref: '#/definitions/entity.Channel'
+      phone:
+        $ref: '#/definitions/entity.Channel'
+    type: object
+  entity.EmailPreferences:
+    properties:
+      approval:
+        type: boolean
+      notifyType:
+        type: string
+    type: object
+  entity.PhonePreferences:
+    properties:
+      approval:
+        type: boolean
+      notifyType:
+        type: string
+    type: object
+  entity.Preferences:
+    properties:
+      email:
+        $ref: '#/definitions/entity.EmailPreferences'
+      phone:
+        $ref: '#/definitions/entity.PhonePreferences'
+    type: object
+  entity.RequestNotification:
+    properties:
+      channels:
+        $ref: '#/definitions/entity.Channels'
+      notifyType:
+        type: string
+      userId:
+        type: string
+    type: object
+  entity.RequestPreferences:
+    properties:
+      preferences:
+        $ref: '#/definitions/entity.Preferences'
+      userId:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -8,28 +60,58 @@ info:
 paths:
   /messages/send:
     post:
-      description: Отправляет сообщение пользователю с заданными полями
+      consumes:
+      - application/json
+      description: Sends a message to the user with the specified fields.
+      parameters:
+      - description: send mess
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestNotification'
+      produces:
+      - application/json
       responses:
         "200":
-          description: success
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
         "500":
-          description: Не удалось создать нотификацию
+          description: Failed to create notification
         "504":
-          description: Время ожидания вышло
-      summary: Отправка сообщения
+          description: Waiting time is up
+      summary: Sending a message
       tags:
       - Notify
   /user/preferences:
     put:
-      description: Изменяет предпочтения пользователя
+      consumes:
+      - application/json
+      description: Changes user preferences
+      parameters:
+      - description: user preferences
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/entity.RequestPreferences'
+      produces:
+      - application/json
       responses:
         "200":
-          description: success
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad request
         "500":
-          description: Не удалось изменить предпочтения
+          description: Failed to edit preferences
         "504":
-          description: Время ожидания вышло
-      summary: Изменение предпочтений
+          description: Waiting time is up
+      summary: Changing preferences
       tags:
       - Preferences
 swagger: "2.0"

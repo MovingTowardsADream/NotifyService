@@ -24,13 +24,16 @@ func newSendMessageRoutes(handler *gin.RouterGroup, w usecase.NotifySend, l *slo
 	}
 }
 
-// @Summary     Отправка сообщения
-// @Description Отправляет сообщение пользователю с заданными полями
+// @Summary     Sending a message
+// @Description Sends a message to the user with the specified fields.
 // @Tags  	    Notify
-// @Success     200 "success"
-// @Failure     500 "Не удалось создать нотификацию"
-// @Failure     504 "Время ожидания вышло"
-// @Example     { "userId": "bf82a761ab8c5ed627c136571d33cb55", "notifyType": "alert", "channels":{ "email":{ "subject": "New alert!", "body": "<html>..." }, "phone":{ "subject": "New alert!", "body": "<html>..." } } }
+// @Accept      json
+// @Produce     json
+// @Param       input body entity.RequestNotification true "send mess"
+// @Success     200 {string} Success
+// @Failure     400 "Bad request"
+// @Failure     500 "Failed to create notification"
+// @Failure     504 "Waiting time is up"
 // @Router      /messages/send [post].
 func (r *sendMessageRoutes) sendMessageById(c *gin.Context) {
 	var notifyRequest entity.RequestNotification
@@ -58,6 +61,6 @@ func (r *sendMessageRoutes) sendMessageById(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, response{
-		Message: "success",
+		Message: "Success",
 	})
 }

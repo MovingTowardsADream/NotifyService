@@ -17,41 +17,169 @@ const docTemplate = `{
     "paths": {
         "/messages/send": {
             "post": {
-                "description": "Отправляет сообщение пользователю с заданными полями",
+                "description": "Sends a message to the user with the specified fields.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Notify"
                 ],
-                "summary": "Отправка сообщения",
+                "summary": "Sending a message",
+                "parameters": [
+                    {
+                        "description": "send mess",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestNotification"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "success"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
                     },
                     "500": {
-                        "description": "Не удалось создать нотификацию"
+                        "description": "Failed to create notification"
                     },
                     "504": {
-                        "description": "Время ожидания вышло"
+                        "description": "Waiting time is up"
                     }
                 }
             }
         },
         "/user/preferences": {
             "put": {
-                "description": "Изменяет предпочтения пользователя",
+                "description": "Changes user preferences",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
                 "tags": [
                     "Preferences"
                 ],
-                "summary": "Изменение предпочтений",
+                "summary": "Changing preferences",
+                "parameters": [
+                    {
+                        "description": "user preferences",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/entity.RequestPreferences"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "success"
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request"
                     },
                     "500": {
-                        "description": "Не удалось изменить предпочтения"
+                        "description": "Failed to edit preferences"
                     },
                     "504": {
-                        "description": "Время ожидания вышло"
+                        "description": "Waiting time is up"
                     }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "entity.Channel": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Channels": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "$ref": "#/definitions/entity.Channel"
+                },
+                "phone": {
+                    "$ref": "#/definitions/entity.Channel"
+                }
+            }
+        },
+        "entity.EmailPreferences": {
+            "type": "object",
+            "properties": {
+                "approval": {
+                    "type": "boolean"
+                },
+                "notifyType": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.PhonePreferences": {
+            "type": "object",
+            "properties": {
+                "approval": {
+                    "type": "boolean"
+                },
+                "notifyType": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.Preferences": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "$ref": "#/definitions/entity.EmailPreferences"
+                },
+                "phone": {
+                    "$ref": "#/definitions/entity.PhonePreferences"
+                }
+            }
+        },
+        "entity.RequestNotification": {
+            "type": "object",
+            "properties": {
+                "channels": {
+                    "$ref": "#/definitions/entity.Channels"
+                },
+                "notifyType": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            }
+        },
+        "entity.RequestPreferences": {
+            "type": "object",
+            "properties": {
+                "preferences": {
+                    "$ref": "#/definitions/entity.Preferences"
+                },
+                "userId": {
+                    "type": "string"
                 }
             }
         }
