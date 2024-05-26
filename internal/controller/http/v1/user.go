@@ -24,6 +24,14 @@ func newUsersRoutes(handler *gin.RouterGroup, w usecase.EditInfo, l *slog.Logger
 	}
 }
 
+// @Summary     Изменение предпочтений
+// @Description Изменяет предпочтения пользователя
+// @Tags  	    Preferences
+// @Success     200 "success"
+// @Failure     500 "Не удалось изменить предпочтения"
+// @Failure     504 "Время ожидания вышло"
+// @Example     { "userId": "bf82a761ab8c5ed627c136571d33cb55", "preferences": { "email":{ "notifyType": "alert", "approval": true }, "phone":{ "notifyType": "alert", "approval": true } } }
+// @Router      /user/preferences [put].
 func (r *usersRoutes) UserPreferences(c *gin.Context) {
 	var preferences entity.RequestPreferences
 

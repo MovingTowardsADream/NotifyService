@@ -1,6 +1,7 @@
 package v1
 
 import (
+	_ "NotifiService/docs"
 	"NotifiService/internal/usecase"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"

@@ -1,0 +1,53 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Notification Service",
+        "title": "Notify Service",
+        "contact": {},
+        "version": "v1.0.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/api/v1",
+    "paths": {
+        "/messages/send": {
+            "post": {
+                "description": "Отправляет сообщение пользователю с заданными полями",
+                "tags": [
+                    "Notify"
+                ],
+                "summary": "Отправка сообщения",
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "500": {
+                        "description": "Не удалось создать нотификацию"
+                    },
+                    "504": {
+                        "description": "Время ожидания вышло"
+                    }
+                }
+            }
+        },
+        "/user/preferences": {
+            "put": {
+                "description": "Изменяет предпочтения пользователя",
+                "tags": [
+                    "Preferences"
+                ],
+                "summary": "Изменение предпочтений",
+                "responses": {
+                    "200": {
+                        "description": "success"
+                    },
+                    "500": {
+                        "description": "Не удалось изменить предпочтения"
+                    },
+                    "504": {
+                        "description": "Время ожидания вышло"
+                    }
+                }
+            }
+        }
+    }
+}

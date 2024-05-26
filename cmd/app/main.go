@@ -9,6 +9,12 @@ import (
 	"syscall"
 )
 
+// @title           Notify Service
+// @version         v1.0.0
+// @description     Notification Service
+
+// @host      localhost:8080
+// @BasePath  /api/v1
 func main() {
 	// Init configuration
 	cfg := configs.MustLoad()
