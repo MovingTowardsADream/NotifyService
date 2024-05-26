@@ -14,7 +14,6 @@ type notifyWorkerRoutes struct {
 	w usecase.NotifyWorker
 }
 
-// Вeclaring routes for rmq rpc.
 func newNotifyWorkerRoutes(routes map[string]rmq_server.CallHandler, w usecase.NotifyWorker) {
 	r := &notifyWorkerRoutes{w}
 	{

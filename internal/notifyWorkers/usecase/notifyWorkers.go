@@ -7,15 +7,9 @@ import (
 	"time"
 )
 
-type (
-	NotifyWorker interface {
-		CreateNewNotify(ctx context.Context, notify entity.Notify) error
-	}
-
-	NotifyWorkerRepo interface {
-		CreateNewNotify(ctx context.Context, user *entity.Notify) error
-	}
-)
+type NotifyWorker interface {
+	CreateNewNotify(ctx context.Context, notify entity.Notify) error
+}
 
 type NotifyWorkerUseCase struct {
 }

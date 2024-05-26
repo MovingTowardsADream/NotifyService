@@ -14,12 +14,10 @@ type NotifyGateway struct {
 	rmq NotifyGatewayRMQ
 }
 
-// Init of wallet gateway, through we will making requests to rmq server.
 func New(rmq NotifyGatewayRMQ) *NotifyGateway {
 	return &NotifyGateway{rmq}
 }
 
-// Creating new wallet with balance, through remote call to rmq server.
 func (gw *NotifyGateway) CreateNotifyMessageOnRabbitMQ(ctx context.Context, notify entity.Notify) error {
 	err := wrapper(ctx, func() error {
 		return gw.rmq.RemoteCall(ctx, "createNewNotify", notify)
@@ -41,7 +39,7 @@ func wrapper(ctx context.Context, f func() error) error {
 
 	select {
 	case <-ctx.Done():
-		return ctx.Err() //nolint:wrapcheck // we need just a send ctx error
+		return ctx.Err()
 	case err := <-errCh:
 		return err
 	}

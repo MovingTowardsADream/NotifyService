@@ -1,7 +1,7 @@
 app:
   name: "notification-service"
-  version: "1.0.0"
-  countWorkers: 24
+  version: "v1.0.0"
+  countWorkers: 11
   timeout: 5s
 
 http:

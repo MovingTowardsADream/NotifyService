@@ -3,33 +3,41 @@ package rmq_server
 import (
 	"NotifiService/pkg/logger"
 	"NotifiService/pkg/rabbitmq/rmq_rpc"
+	"encoding/json"
 	"fmt"
 	"github.com/streadway/amqp"
 	"log/slog"
+	"runtime"
+	"sync"
 	"time"
 )
 
 const (
-	_defaultWaitTime        = 2 * time.Second
-	_defaultAttempts        = 10
-	_defaultTimeout         = 2 * time.Second
-	_defaultGoroutinesCount = 24
+	_defaultWaitTime = 2 * time.Second
+	_defaultAttempts = 10
+	_defaultTimeout  = 2 * time.Second
 
 	Success = "success"
 )
 
+var _defaultGoroutinesCount = runtime.NumCPU()
+
 type CallHandler func(*amqp.Delivery) (interface{}, error)
 
 type Server struct {
-	conn   *rmq_rpc.Connection
-	error  chan error
-	stop   chan struct{}
-	router map[string]CallHandler
+	serverExchange string
+	conn           *rmq_rpc.Connection
+	error          chan error
+	stop           chan struct{}
+	router         map[string]CallHandler
 
 	timeout         time.Duration
 	goroutinesCount int
 
 	logger *slog.Logger
+
+	rw       sync.RWMutex
+	mistakes map[string]int
 }
 
 func New(url, serverExchange string, router map[string]CallHandler, l *slog.Logger, opts ...Option) (*Server, error) {
@@ -40,6 +48,7 @@ func New(url, serverExchange string, router map[string]CallHandler, l *slog.Logg
 	}
 
 	s := &Server{
+		serverExchange:  serverExchange,
 		conn:            rmq_rpc.NewConnectionRabbitMQ(serverExchange, cfg),
 		error:           make(chan error),
 		stop:            make(chan struct{}),
@@ -86,37 +95,86 @@ func (s *Server) consumer() {
 	}
 }
 
+func (s *Server) republish(corrID, handler string, request interface{}) error {
+	var (
+		requestBody []byte
+		err         error
+	)
+
+	if request != nil {
+		requestBody, err = json.Marshal(request)
+		if err != nil {
+			return fmt.Errorf("publish - json.Marshal: %w", err)
+		}
+	}
+
+	err = s.conn.Channel.Publish(s.serverExchange, "", false, false,
+		amqp.Publishing{
+			ContentType:   "application/json",
+			CorrelationId: corrID,
+			ReplyTo:       s.serverExchange,
+			Type:          handler,
+			Body:          requestBody,
+		})
+	if err != nil {
+		return fmt.Errorf("c.Channel.Publish: %w", err)
+	}
+
+	return nil
+}
+
 func (s *Server) serveCall(d *amqp.Delivery) {
 	callHandler, ok := s.router[d.Type]
 	if !ok {
-		s.publish(d, nil, rmq_rpc.ErrBadHandler.Error())
-
 		return
 	}
 
 	response, err := callHandler(d)
 
 	if err != nil {
-		// TODO republish response
-		fmt.Println(response)
+		count := s.getMistake(d.CorrelationId)
 
-		s.publish(d, nil, err.Error())
+		if count >= 3 {
+			s.deleteMistake(d.CorrelationId)
+			return
+		}
+
+		s.addMistake(d.CorrelationId)
+
+		err = s.republish(d.CorrelationId, d.Type, response)
+
+		if err != nil {
+			s.logger.Error("rmq_server - Server - serveCall - s.Republish", logger.Err(err))
+			return
+		}
 
 		return
 	}
+
+	s.deleteMistake(d.CorrelationId)
 }
 
-func (s *Server) publish(d *amqp.Delivery, body []byte, status string) {
-	err := s.conn.Channel.Publish(d.ReplyTo, "", false, false,
-		amqp.Publishing{
-			ContentType:   "application/json",
-			CorrelationId: d.CorrelationId,
-			Type:          status,
-			Body:          body,
-		})
-	if err != nil {
-		s.logger.Error("rmq_rpc server - Server - publish - s.conn.Channel.Publish", logger.Err(err))
+func (s *Server) getMistake(corrID string) int {
+	s.rw.RLock()
+	count, ok := s.mistakes[corrID]
+	s.rw.RUnlock()
+
+	if !ok {
+		return 0
 	}
+	return count
+}
+
+func (s *Server) addMistake(corrID string) {
+	s.rw.Lock()
+	s.mistakes[corrID]++
+	s.rw.Unlock()
+}
+
+func (s *Server) deleteMistake(corrID string) {
+	s.rw.Lock()
+	delete(s.mistakes, corrID)
+	s.rw.Unlock()
 }
 
 func (s *Server) reconnect() {
